@@ -1,0 +1,14 @@
+<%# data-seen marks cards whose impression this shopper session already recorded. %>
+<li class="offer-card" data-offer-card data-offer-id="<%= offer.id %>" data-position="<%= offer.position %>"
+    <%= "data-seen" if seen_ids.include?(offer.id) %>>
+  <%= offer_placeholder(offer) %>
+  <div class="offer-card__body">
+    <p class="offer-card__merchant"><%= offer.merchant %></p>
+    <h2 class="offer-card__title"><%= offer.title %></h2>
+    <p class="offer-card__description"><%= offer.description %></p>
+    <p class="offer-card__discount"><%= offer.discount_text %></p>
+    <%= button_to "View offer", click_offer_path(offer), class: "btn btn--primary",
+                  form: { class: "offer-card__action" },
+                  "aria-label": "View offer: #{offer.title}" %>
+  </div>
+</li>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Member Shop (demo)" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= stylesheet_link_tag :app %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand__mark" aria-hidden="true">MS</span>
+          <span>Member Shop <span class="brand__tag">demo</span></span>
+        <% end %>
+
+        <div class="account">
+          <% if signed_in? %>
+            <span class="account__who">Signed in as <strong><%= current_user.display_name %></strong></span>
+            <%= button_to "Sign out", demo_session_path, method: :delete, class: "btn btn--quiet" %>
+          <% else %>
+            <span class="account__who">Browsing as guest</span>
+            <%= button_to "Demo sign in", demo_session_path, class: "btn btn--quiet" %>
+          <% end %>
+        </div>
+      </div>
+      <p class="demo-note">
+        Demonstration sign-in only: one click, one seeded account, no password. Not real authentication.
+      </p>
+    </header>
+
+    <main class="page">
+      <% if notice %><p class="flash flash--notice" role="status"><%= notice %></p><% end %>
+      <% if alert %><p class="flash flash--alert" role="alert"><%= alert %></p><% end %>
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      Fictional offers for demonstration. <%= link_to "Demo status", status_path %>
+    </footer>
+
+    <%= render "shared/developer_panel" if developer_panel? && content_for?(:developer_panel) %>
+  </body>
+</html>

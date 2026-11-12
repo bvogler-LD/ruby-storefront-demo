@@ -1,0 +1,23 @@
+<% content_for :title, "#{@offer.title} · Member Shop (demo)" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Shop", root_path %> <span aria-hidden="true">/</span>
+  <% if @subcategory %>
+    <%= link_to @subcategory.name, shop_subcategory_path(@subcategory.slug) %> <span aria-hidden="true">/</span>
+  <% end %>
+  <span aria-current="page">Offer</span>
+</nav>
+
+<article class="offer-detail">
+  <%= offer_placeholder(@offer) %>
+  <div>
+    <p class="offer-card__merchant"><%= @offer.merchant %></p>
+    <h1><%= @offer.title %></h1>
+    <p class="offer-card__discount"><%= @offer.discount_text %></p>
+    <p><%= @offer.description %></p>
+    <p class="offer-detail__note">This is a fictional offer. In a real shop this page would send you to the merchant.</p>
+    <% if @subcategory %>
+      <%= link_to "← Back to #{@subcategory.name}", shop_subcategory_path(@subcategory.slug), class: "btn btn--quiet" %>
+    <% end %>
+  </div>
+</article>

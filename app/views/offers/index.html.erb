@@ -1,0 +1,90 @@
+<% content_for :title, "#{@subcategory.name} offers · Member Shop (demo)" %>
+<% shop = Rails.configuration.x.shop %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Shop", root_path %> <span aria-hidden="true">/</span>
+  <span><%= @subcategory.category %></span> <span aria-hidden="true">/</span>
+  <span aria-current="page"><%= @subcategory.name %></span>
+</nav>
+
+<header class="list-header">
+  <div>
+    <h1><%= @subcategory.name %></h1>
+    <p class="list-header__meta"><%= pluralize(@total, "offer") %> · <%= @subcategory.blurb %></p>
+  </div>
+  <p class="experience-badge" data-experience="<%= @experience.variation %>">
+    List style:
+    <strong><%= @experience.pagination? ? "Pages of #{page_size}" : "Continuous scroll" %></strong>
+  </p>
+</header>
+
+<ul class="offer-grid" id="offer-list"
+    data-offer-list
+    data-experience="<%= @experience.variation %>"
+    data-impressions-url="<%= events_impressions_path %>"
+    data-impression-ratio="<%= shop.impression_visible_ratio %>"
+    data-impression-dwell-ms="<%= shop.impression_dwell_ms %>"
+    <% if @experience.infinite_scroll? %>
+      data-batch-url="<%= shop_offer_batch_path(@subcategory.slug) %>"
+      data-next-after="<%= @offers.last&.position.to_i %>"
+      data-has-more="<%= @has_more %>"
+    <% end %>>
+  <%= render partial: "offers/offer", collection: @offers, locals: { seen_ids: @seen_ids } %>
+</ul>
+
+<% if @experience.pagination? %>
+  <nav class="pagination" aria-label="Offer pages">
+    <% if @page > 1 %>
+      <%= link_to "← Previous", shop_subcategory_path(@subcategory.slug, page: @page - 1), rel: "prev", class: "pagination__step" %>
+    <% else %>
+      <span class="pagination__step pagination__step--disabled" aria-disabled="true">← Previous</span>
+    <% end %>
+
+    <ol class="pagination__pages">
+      <% previous = nil %>
+      <% page_window(@page, @total_pages).each do |number| %>
+        <% if previous && number > previous + 1 %><li class="pagination__gap" aria-hidden="true">…</li><% end %>
+        <li>
+          <% if number == @page %>
+            <span class="pagination__page pagination__page--current" aria-current="page"><%= number %></span>
+          <% else %>
+            <%= link_to number, shop_subcategory_path(@subcategory.slug, page: number), class: "pagination__page",
+                        "aria-label": "Page #{number}" %>
+          <% end %>
+        </li>
+        <% previous = number %>
+      <% end %>
+    </ol>
+
+    <% if @page < @total_pages %>
+      <%= link_to "Next →", shop_subcategory_path(@subcategory.slug, page: @page + 1), rel: "next", class: "pagination__step" %>
+    <% else %>
+      <span class="pagination__step pagination__step--disabled" aria-disabled="true">Next →</span>
+    <% end %>
+  </nav>
+  <p class="list-status">Page <%= @page %> of <%= @total_pages %></p>
+<% else %>
+  <div class="list-status" data-list-status aria-live="polite">
+    <p data-state="loading" hidden><span class="spinner" aria-hidden="true"></span> Loading more offers…</p>
+    <p data-state="end" <%= "hidden" if @has_more %>>You've reached the end: all <%= pluralize(@total, "offer") %> shown.</p>
+    <p data-state="error" hidden>
+      We couldn't load more offers.
+      <button type="button" class="btn btn--quiet" data-retry>Try again</button>
+    </p>
+  </div>
+  <div data-scroll-sentinel aria-hidden="true"></div>
+<% end %>
+
+<% content_for :developer_panel do %>
+  <dl>
+    <dt>Context kind</dt><dd><%= shopper_context.kind %></dd>
+    <dt>Identity state</dt><dd><%= shopper_context.anonymous? ? "anonymous guest" : "signed-in user" %></dd>
+    <dt>Context key</dt><dd><%= shopper_context.redacted_key %></dd>
+    <dt>Flag</dt><dd><%= OfferListExperience.flag_key %></dd>
+    <dt>Served</dt><dd><%= @experience.variation %></dd>
+    <dt>Source</dt>
+    <dd><%= @experience.fallback? ? "fallback default (#{@experience.reason})" : "LaunchDarkly (#{@experience.reason})" %></dd>
+    <dt>Impressions sent</dt><dd data-dev-impressions><%= @seen_ids.size %></dd>
+    <dt>End reached</dt><dd data-dev-end><%= impression_state_end? ? "yes" : "no" %></dd>
+  </dl>
+<% end %>

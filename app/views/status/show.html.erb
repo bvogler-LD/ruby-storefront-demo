@@ -1,0 +1,29 @@
+<% content_for :title, "Demo status · Member Shop (demo)" %>
+<h1>Demo status</h1>
+<p class="list-header__meta">Readiness of this local demo. No keys, tokens, or shopper identifiers are shown here.</p>
+
+<% ld = @status["LaunchDarkly"] %>
+<p class="status-banner status-banner--<%= ld[:mode] %>">
+  <% if ld[:mode] == "launchdarkly" %>
+    LaunchDarkly is connected. The offer list style is served by the flag.
+  <% else %>
+    Fallback mode (<%= ld[:reason] %>). Every shopper gets
+    <strong><%= OfferListExperience::DEFAULT %></strong> and no events are sent.
+  <% end %>
+</p>
+
+<% @status.each do |section, values| %>
+  <section class="status-section">
+    <h2><%= section %></h2>
+    <% if values.is_a?(Hash) %>
+      <dl>
+        <% values.each do |name, value| %>
+          <dt><%= name.to_s.humanize %></dt>
+          <dd><%= value.is_a?(Array) ? value.join(", ") : value %></dd>
+        <% end %>
+      </dl>
+    <% else %>
+      <p><%= values.join(", ") %></p>
+    <% end %>
+  </section>
+<% end %>

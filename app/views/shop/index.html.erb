@@ -1,0 +1,19 @@
+<% content_for :title, "Shop · Member Shop (demo)" %>
+
+<section class="hero">
+  <h1>Shop member offers</h1>
+  <p>Pick a category to browse current offers.</p>
+</section>
+
+<ul class="category-list">
+  <% @subcategories.each do |subcategory| %>
+    <li>
+      <%= link_to shop_subcategory_path(subcategory.slug), class: "category-tile" do %>
+        <span class="category-tile__category"><%= subcategory.category %></span>
+        <span class="category-tile__name"><%= subcategory.name %></span>
+        <span class="category-tile__blurb"><%= subcategory.blurb %></span>
+        <span class="category-tile__cta">Browse offers →</span>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
